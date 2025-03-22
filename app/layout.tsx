@@ -21,6 +21,7 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import PatchNotes from "@/components/PatchNotes";
+import Sidebar from "@/components/Sidebar";
 
 const poppins = Poppins({
   weight: ["200", "400", "600"],
@@ -86,6 +87,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <div id="main" className="mx-auto dark">
                 <Toaster position="top-center" />
                 <PatchNotes />
+                <Sidebar />
                 {children}
               </div>
             </NextAuthProvider>
