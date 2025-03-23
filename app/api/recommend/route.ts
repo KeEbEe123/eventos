@@ -4,6 +4,9 @@ import { connectMongoDB } from "@/lib/mongodb";
 import Photographer from "@/models/Photographer";
 import Decorator from "@/models/Decorator";
 import Venue from "@/models/Venue";
+import Caterer from "@/models/Caterer";
+import Logistics from "@/models/Logistics";
+import Entertainment from "@/models/Entertainment";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY as string);
 function extractJSON(responseText: string): string {
@@ -98,6 +101,38 @@ export async function POST(req: Request) {
         { capacity: { $gte: numberOfGuests } }, // Matches guest count
       ],
     }).sort({ ratings: -1 });
+    const caterers = await Caterer.find({
+      $or: [
+        {
+          specialties: { $regex: eventType, $options: "i" },
+          location: { $regex: location, $options: "i" },
+        },
+        { specialties: { $regex: eventType, $options: "i" } },
+        { location: { $regex: location, $options: "i" } },
+      ],
+    }).sort({ ratings: -1 });
+
+    const logistics = await Logistics.find({
+      $or: [
+        {
+          services: { $regex: eventType, $options: "i" },
+          location: { $regex: location, $options: "i" },
+        },
+        { services: { $regex: eventType, $options: "i" } },
+        { location: { $regex: location, $options: "i" } },
+      ],
+    }).sort({ ratings: -1 });
+
+    const entertainment = await Entertainment.find({
+      $or: [
+        {
+          type: { $regex: eventType, $options: "i" },
+          location: { $regex: location, $options: "i" },
+        },
+        { type: { $regex: eventType, $options: "i" } },
+        { location: { $regex: location, $options: "i" } },
+      ],
+    }).sort({ ratings: -1 });
 
     // 🔹 Step 3: Handle cases where no exact matches are found
     const recommendedPhotographers = photographers.length
@@ -109,6 +144,17 @@ export async function POST(req: Request) {
     const recommendedVenues = venues.length
       ? venues
       : await Venue.find().sort({ ratings: -1 }).limit(3);
+    const recommendedCaterers = caterers.length
+      ? caterers
+      : await Caterer.find().sort({ ratings: -1 }).limit(3);
+
+    const recommendedLogistics = logistics.length
+      ? logistics
+      : await Logistics.find().sort({ ratings: -1 }).limit(3);
+
+    const recommendedEntertainment = entertainment.length
+      ? entertainment
+      : await Entertainment.find().sort({ ratings: -1 }).limit(3);
 
     return NextResponse.json({
       message: "AI Recommendations Generated",
@@ -116,6 +162,9 @@ export async function POST(req: Request) {
         photographers: recommendedPhotographers,
         decorators: recommendedDecorators,
         venues: recommendedVenues,
+        caterers: recommendedCaterers,
+        logistics: recommendedLogistics,
+        entertainment: recommendedEntertainment,
       },
     });
   } catch (error) {

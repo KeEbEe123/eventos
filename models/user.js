@@ -1,5 +1,23 @@
 import mongoose, { Schema, models } from "mongoose";
 
+// Define the schema for a vendor entry
+const vendorEntrySchema = new Schema(
+  {
+    refId: { type: Schema.Types.ObjectId, required: true },
+    serviceType: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+// Define the schema for a collection
+const collectionSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    vendors: [vendorEntrySchema],
+  },
+  { _id: true }
+);
+
 // Define the main user schema
 const userSchema = new Schema({
   name: { type: String, required: true },
@@ -11,13 +29,7 @@ const userSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   lastName: { type: String, required: false, default: "" },
   image: { type: String, default: null },
-  collections: [
-    {
-      name: { type: String, required: true },
-      vendors: [{ type: Schema.Types.ObjectId, ref: "Vendor" }], // Vendors in each collection
-    },
-  ],
-  // Add cart field
+  collections: [collectionSchema],
 });
 
 const User = models.User || mongoose.model("User", userSchema);

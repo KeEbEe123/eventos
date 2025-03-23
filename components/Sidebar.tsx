@@ -91,13 +91,26 @@ const Sidebar = () => {
       {!collapsed && (
         <div className="bg-gray-200 p-4 shadow-xl rounded-b-lg w-full max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold">Your Collections</h2>
-          <ul className="mt-4">
+          <ul className="mt-4 space-y-4">
             {collections.map((col) => (
-              <li key={col._id} className="p-2 border-b">
-                {col.name}
+              <li key={col._id} className="p-3 border rounded bg-white shadow">
+                <h3 className="font-semibold text-lg mb-2">{col.name}</h3>
+                {col.vendors.length > 0 ? (
+                  <ul className="pl-2 space-y-1">
+                    {col.vendors.map((vendor: any) => (
+                      <li key={vendor._id} className="text-sm text-gray-700">
+                        <span className="font-medium">{vendor.name}</span> –{" "}
+                        <span className="italic">{vendor.serviceType}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm italic text-gray-500">No vendors yet</p>
+                )}
               </li>
             ))}
           </ul>
+
           <div className="mt-4">
             <input
               type="text"
