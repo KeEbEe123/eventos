@@ -32,3 +32,44 @@ body {
   background: black;
   filter: blur(20px);
 }
+
+/* app/globals.css */
+.input-glow {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.input-glow::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, #ff00cc, #3333ff, #00ffcc, #ff00cc);
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  animation: glowRotate 3s linear infinite;
+  filter: blur(8px);
+}
+
+.input-glow:hover::before {
+  opacity: 1;
+}
+
+@keyframes glowRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.input-glow input {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}

@@ -47,7 +47,7 @@ const CyclingText: React.FC<CyclingTextProps> = ({
             animate={{ y: "0%", opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="absolute left-0 top-0 mt-2"
+            className="absolute left-0 top-0 mt-2 text-primary"
             style={{ whiteSpace: "pre" }} // preserve spacing
           >
             {paddedWords[index]}

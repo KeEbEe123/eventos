@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Logo from "@/assets/images/s.png";
+import Logo from "@/public/logo.png";
 import PrimaryBtn from "./PrimaryBtn";
 import { Koulen } from "next/font/google";
 import { signIn, signOut, useSession } from "next-auth/react";
@@ -21,6 +21,7 @@ import {
 } from "@nextui-org/react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { TbShoppingCart } from "react-icons/tb";
 
 const Navbar: React.FC = () => {
   const { status, data: session } = useSession();
@@ -58,25 +59,27 @@ const Navbar: React.FC = () => {
       className={`flex items-center justify-between p-4 bg-background text-primary`}
     >
       <Link href="/">
-        <Image src={Logo} alt="Logo" width={80} height={80} className="" />
+        <Image
+          src={Logo}
+          alt="Logo"
+          width={150}
+          height={150}
+          className="absolute top-6"
+        />
       </Link>
 
-      <div className="flex space-x-4">
+      <div classNa me="flex space-x-4">
         {session ? (
           <div className="flex flex-row items-center space-x-8">
-            <Tooltip
-              content="Score"
-              showArrow={true}
-              delay={500}
-              className="bg-pink-600 rounded-3xl text-white"
+            <button
+              onClick={() => router.push("/onboarding")}
+              className="px-4 py-2 mr-6 text-lg font-koulen bg-background text-primary rounded-lg  hover:bg-primary hover:text-background hover:rounded-2xl hover:shadow-glow hover:shadow-primary transition-all duration-300"
             >
-              <button
-                onClick={() => router.push("/onboarding")}
-                className="px-4 py-2 mr-6 text-lg font-koulen bg-background text-primary rounded-lg  hover:bg-primary hover:text-background hover:rounded-2xl hover:shadow-glow hover:shadow-primary transition-all duration-300"
-              >
-                Partner with us
-              </button>
-            </Tooltip>
+              Partner with us
+            </button>
+            <button onClick={() => router.push("/cart")}>
+              <TbShoppingCart className="text-4xl mr-2 text-white"></TbShoppingCart>
+            </button>
             <Image
               src={session?.user?.image || "/default-profile.png"}
               alt="Profile Picture"
@@ -173,6 +176,7 @@ const Navbar: React.FC = () => {
             >
               Partner with us
             </button>
+
             <button
               onClick={() => signIn("google")}
               className="px-4 py-2 text-lg font-koulen bg-background text-primary rounded-lg  hover:bg-primary hover:text-background hover:rounded-2xl hover:shadow-glow hover:shadow-primary transition-all duration-300"

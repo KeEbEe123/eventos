@@ -68,7 +68,7 @@ function CardMine({ vendor, serviceName, serviceHref, image }: CardMineProps) {
         <Image
           removeWrapper
           alt="Loading placeholder"
-          className="z-0 w-full h-full -translate-y-6 object-contain"
+          className="z-0 w-full h-full -translate-y-6 object-cover"
           src="https://heroui.com/images/card-example-6.jpeg"
         />
       </Card>
@@ -83,15 +83,12 @@ function CardMine({ vendor, serviceName, serviceHref, image }: CardMineProps) {
       className="w-full h-[300px]"
       isBlurred
     >
-      <CardHeader className="absolute z-10 top-1 flex-col items-start bg-white/30 blur-xs">
-        <p className="text-tiny text-white/60 uppercase font-bold">Service</p>
-        <h4 className="text-black font-medium text-2xl">{serviceName}</h4>
-      </CardHeader>
+      {/* <CardHeader className="absolute z-10 top-1 flex-col items-start bg-white/30 blur-xs"></CardHeader> */}
 
       <Image
         removeWrapper
         alt={`${serviceName} background`}
-        className="z-0 w-full h-full  -translate-y-6 object-contain"
+        className="z-0 w-full h-full  -translate-y-6 object-cover"
         src={
           image ||
           vendor?.imageUrl ||
@@ -119,26 +116,13 @@ function CardMine({ vendor, serviceName, serviceHref, image }: CardMineProps) {
           </Button>
         </CardBody>
       ) : (
-        <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
+        <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10">
           <div>
-            <p className="text-black text-tiny">
-              {vendor?.location || "Location not available"}
+            <p className="text-tiny text-white/60 uppercase font-bold flex justify-start">
+              Service
             </p>
-            <p className="text-black text-tiny">Click to add to collection</p>
+            <h4 className="text-black font-medium text-2xl">{serviceName}</h4>
           </div>
-          <Button
-            className="text-tiny"
-            color="primary"
-            radius="full"
-            size="sm"
-            onPress={(e) => {
-              e.stopPropagation();
-              setShowPrompt(true);
-              fetchCollections();
-            }}
-          >
-            Add to Collection
-          </Button>
         </CardFooter>
       )}
     </Card>

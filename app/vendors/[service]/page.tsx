@@ -2,7 +2,7 @@
 import { notFound } from "next/navigation";
 import CardMine from "@/components/CardMine";
 import axios from "axios";
-import PhotographerCard from "@/components/PhotoCard";
+import VendorCard from "@/components/VendorCard";
 
 interface Vendor {
   _id: string;
@@ -20,12 +20,12 @@ interface PageProps {
 export default async function VendorServicePage({ params }: PageProps) {
   const { service } = params;
   const cardComponentMap: Record<string, React.FC<any>> = {
-    photographers: PhotographerCard,
-    decorators: PhotographerCard, // Reusing the same card
-    logistics: PhotographerCard, // Reusing the same card
-    entertainment: PhotographerCard, // Reusing the same card
-    venues: PhotographerCard, // Reusing the same card
-    catering: PhotographerCard, // Reusing the same card
+    photographers: VendorCard,
+    decorators: VendorCard, // Reusing the same card
+    logistics: VendorCard, // Reusing the same card
+    entertainment: VendorCard, // Reusing the same card
+    venues: VendorCard, // Reusing the same card
+    catering: VendorCard, // Reusing the same card
     // Add more if needed: caterers: CatererCard, etc.
   };
 

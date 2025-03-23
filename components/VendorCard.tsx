@@ -8,10 +8,12 @@ import {
   Button,
   Image,
   Avatar,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { AddToCollectionButton } from "./AddToCollectionButton";
+import axios from "axios";
 
 interface Vendor {
   _id: string;
@@ -21,25 +23,46 @@ interface Vendor {
   name?: string;
 }
 
-interface PhotographerCardProps {
+interface VendorCardProps {
   vendor: Vendor;
   serviceName: string;
   serviceHref: string;
 }
 
-function PhotographerCard({
-  vendor,
-  serviceName,
-  serviceHref,
-}: PhotographerCardProps) {
+function VendorCard({ vendor, serviceName, serviceHref }: VendorCardProps) {
   const router = useRouter();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [vendorImage, setVendorImage] = useState<string>("");
   const { status, data: session } = useSession();
+  const [collections, setCollections] = useState<any[]>([]);
+  const [selectedCollection, setSelectedCollection] = useState<string>("");
 
   const images = vendor.images?.length
     ? vendor.images
     : ["https://heroui.com/images/card-example-6.jpeg"];
+
+  // Fetch collections
+  // Fetch collections periodically
+  useEffect(() => {
+    const fetchCollections = async () => {
+      if (status !== "authenticated") return;
+
+      try {
+        const { data } = await axios.get("/api/collections/get");
+        setCollections(data.collections || []);
+      } catch (error) {
+        console.error("Failed to fetch collections:", error);
+      }
+    };
+
+    fetchCollections(); // Initial fetch
+
+    const interval = setInterval(() => {
+      fetchCollections();
+    }, 40000); // Fetch every 2 seconds
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [status]);
 
   // Cycle through images every 3 seconds
   useEffect(() => {
@@ -76,6 +99,22 @@ function PhotographerCard({
     router.push(serviceHref);
   };
 
+  const handleAddToCollection = async () => {
+    if (!selectedCollection || !session) return;
+
+    try {
+      await axios.post("/api/collections/add-vendor", {
+        collectionId: selectedCollection,
+        vendorId: vendor._id,
+        serviceType: serviceName, // Assuming serviceName matches serviceType
+      });
+      alert("Vendor added to collection successfully!");
+    } catch (error) {
+      console.error("Error adding vendor to collection:", error);
+      alert("Failed to add vendor to collection.");
+    }
+  };
+
   return (
     <Card isFooterBlurred className="w-full h-[300px]" isBlurred>
       <div className="flex gap-5">
@@ -99,27 +138,36 @@ function PhotographerCard({
         src={images[currentImageIndex]}
       />
 
-      <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 justify-between">
-        <div>
-          <p className="text-black text-tiny">
-            {vendor.location || "Location not available"}
-          </p>
-          <p className="text-black text-tiny">Click to view profile</p>
-          <AddToCollectionButton vendorId={vendor._id} />
-        </div>
-        <div className="flex gap-1">
-          {images.map((_, idx) => (
-            <span
-              key={idx}
-              className={`w-2 h-2 rounded-full ${
-                idx === currentImageIndex ? "bg-black" : "bg-gray-300"
-              }`}
-            />
-          ))}
+      <CardFooter className="absolute bg-white/30 bottom-0 border-t-1 border-zinc-100/50 z-10 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          {/* Select Component for Collections */}
+          <Select
+            label="Add to Collection"
+            placeholder="Select a collection"
+            className="w-40" // Adjust width as needed
+            value={selectedCollection}
+            onChange={(e) => setSelectedCollection(e.target.value)}
+          >
+            {collections.map((collection) => (
+              <SelectItem key={collection._id} value={collection._id}>
+                {collection.name}
+              </SelectItem>
+            ))}
+          </Select>
+
+          {/* Add to Collection Button */}
+          <Button
+            size="sm"
+            className="bg-black"
+            onClick={handleAddToCollection}
+            disabled={!selectedCollection}
+          >
+            Add
+          </Button>
         </div>
       </CardFooter>
     </Card>
   );
 }
 
-export default PhotographerCard;
+export default VendorCard;

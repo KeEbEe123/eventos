@@ -36,6 +36,7 @@ const koulen = Koulen({
 });
 const dm = DM_Sans({
   weight: "400",
+  style: "italic",
   variable: "--font-dm",
   subsets: ["latin"],
 });

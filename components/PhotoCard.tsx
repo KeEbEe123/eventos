@@ -41,12 +41,6 @@ function PhotographerCard({
     : ["https://heroui.com/images/card-example-6.jpeg"];
 
   // Cycle through images every 3 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [images.length]);
 
   // Fetch avatar for vendor
   useEffect(() => {

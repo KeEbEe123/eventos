@@ -1,9 +1,12 @@
+// app/api/collections/add-vendor/route.ts
 import { NextResponse } from "next/server";
 import User from "@/models/user";
 import { getServerSession } from "next-auth";
+import mongoose from "mongoose";
 
 export async function POST(req: Request) {
   const session = await getServerSession();
+
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -11,11 +14,18 @@ export async function POST(req: Request) {
   const { collectionId, vendorId, serviceType } = await req.json();
 
   if (!collectionId || !vendorId || !serviceType) {
-    return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing required fields" },
+      { status: 400 }
+    );
   }
 
   try {
     const user = await User.findOne({ email: session.user?.email });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     const collection = user.collections.id(collectionId);
     if (!collection) {
@@ -25,24 +35,31 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check for duplicates based on refId and serviceType
-    const alreadyExists = collection.vendors.some(
-      (vendor: any) =>
-        vendor.refId.toString() === vendorId &&
-        vendor.serviceType === serviceType
+    // Check if vendor already exists in the collection
+    const vendorExists = collection.vendors.some(
+      (v: any) => v.refId.toString() === vendorId
     );
-
-    if (!alreadyExists) {
-      collection.vendors.push({
-        refId: vendorId,
-        serviceType,
-      });
-      await user.save();
+    if (vendorExists) {
+      return NextResponse.json(
+        { error: "Vendor already in collection" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ success: true, collection });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    // Add vendor to collection
+    collection.vendors.push({
+      refId: new mongoose.Types.ObjectId(vendorId),
+      serviceType,
+    });
+
+    await user.save();
+
+    return NextResponse.json({ message: "Vendor added successfully" });
+  } catch (error) {
+    console.error("Error adding vendor to collection:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
