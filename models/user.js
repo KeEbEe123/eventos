@@ -10,6 +10,7 @@ const userSchema = new Schema({
   onboard: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
   lastName: { type: String, required: false, default: "" },
+  image: { type: String, default: null },
   collections: [
     {
       name: { type: String, required: true },

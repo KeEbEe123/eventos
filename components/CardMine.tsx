@@ -9,9 +9,8 @@ import {
   Image,
 } from "@heroui/react";
 import axios from "axios";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useRouter } from "next/navigation";
 
-// Define the expected shape of the props
 interface Vendor {
   _id?: string;
   location?: string;
@@ -22,10 +21,11 @@ interface CardMineProps {
   vendor?: Vendor;
   serviceName: string;
   serviceHref: string;
+  image?: string; // ✅ New image prop
 }
 
-function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
-  const router = useRouter(); // Initialize router for navigation
+function CardMine({ vendor, serviceName, serviceHref, image }: CardMineProps) {
+  const router = useRouter();
   const [collections, setCollections] = useState<any[]>([]);
   const [selectedCollection, setSelectedCollection] = useState("");
   const [showPrompt, setShowPrompt] = useState(false);
@@ -58,7 +58,6 @@ function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
     }
   };
 
-  // If no serviceName is provided, show a loading/placeholder state
   if (!serviceName) {
     return (
       <Card isFooterBlurred isPressable className="w-full h-[300px]" isBlurred>
@@ -69,7 +68,7 @@ function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
         <Image
           removeWrapper
           alt="Loading placeholder"
-          className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
+          className="z-0 w-full h-full -translate-y-6 object-contain"
           src="https://heroui.com/images/card-example-6.jpeg"
         />
       </Card>
@@ -80,7 +79,7 @@ function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
     <Card
       isFooterBlurred
       isPressable
-      onPress={handleCardClick} // Add navigation on card click
+      onPress={handleCardClick}
       className="w-full h-[300px]"
       isBlurred
     >
@@ -92,10 +91,12 @@ function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
       <Image
         removeWrapper
         alt={`${serviceName} background`}
-        className="z-0 w-full h-full scale-125 -translate-y-6 object-cover"
+        className="z-0 w-full h-full  -translate-y-6 object-contain"
         src={
-          vendor?.imageUrl || "https://heroui.com/images/card-example-6.jpeg"
-        }
+          image ||
+          vendor?.imageUrl ||
+          "https://heroui.com/images/card-example-6.jpeg"
+        } // ✅ Prioritize `image` prop
       />
 
       {showPrompt ? (
@@ -131,7 +132,7 @@ function CardMine({ vendor, serviceName, serviceHref }: CardMineProps) {
             radius="full"
             size="sm"
             onPress={(e) => {
-              e.stopPropagation(); // Prevent card click from triggering
+              e.stopPropagation();
               setShowPrompt(true);
               fetchCollections();
             }}

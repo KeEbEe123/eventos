@@ -15,6 +15,7 @@ const BasicDetails = ({ userEmail }: { userEmail: string }) => {
     priceRangeMax: "",
     amenities: "",
   });
+  const [images, setImages] = useState<File[]>([]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -26,12 +27,28 @@ const BasicDetails = ({ userEmail }: { userEmail: string }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const response = await axios.post("/api/onboard", {
+      let photoUrls: string[] = [];
+
+      if (images.length > 0) {
+        const formDataImages = new FormData();
+        images.forEach((image) => formDataImages.append("images", image)); // key must be 'images'
+
+        const { data } = await axios.post("/api/upload", formDataImages, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        photoUrls = data.urls; // Now this will correctly contain the uploaded image URLs
+      }
+
+      await axios.post("/api/onboard", {
         role,
         ...formData,
         email: userEmail,
+        images: photoUrls, // Send the correct URLs to your DB
       });
+
       alert("Onboarding successful! You will be signed out now.");
       await signOut({ callbackUrl: "/" });
     } catch (error) {
@@ -53,6 +70,9 @@ const BasicDetails = ({ userEmail }: { userEmail: string }) => {
         <option value="photographer">Photographer</option>
         <option value="decorator">Decorator</option>
         <option value="venue_distributor">Venue Distributor</option>
+        <option value="logistics">Logistics Provider</option>
+        <option value="entertainment">Entertainment</option>
+        <option value="caterer">Caterer</option>
       </select>
 
       <div className="mt-4">
@@ -149,6 +169,21 @@ const BasicDetails = ({ userEmail }: { userEmail: string }) => {
           </>
         )}
       </div>
+      <label className="block mt-4 mb-2">Upload Photos (max 5):</label>
+      <input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length > 5) {
+            alert("You can only upload up to 5 images.");
+          } else {
+            setImages(files);
+          }
+        }}
+        className="w-full"
+      />
 
       <button
         onClick={handleSubmit}

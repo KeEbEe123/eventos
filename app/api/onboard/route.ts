@@ -4,6 +4,9 @@ import User from "@/models/user";
 import Photographer from "@/models/Photographer";
 import Decorator from "@/models/Decorator";
 import Venue from "@/models/Venue";
+import Logistics from "@/models/Logistics";
+import Caterer from "@/models/Caterer";
+import Entertainment from "@/models/Entertainment";
 
 export async function POST(req: Request) {
   try {
@@ -21,6 +24,7 @@ export async function POST(req: Request) {
       priceRangeMin,
       priceRangeMax,
       amenities,
+      images,
     } = body;
 
     // Update User to set onboarded = true
@@ -39,6 +43,7 @@ export async function POST(req: Request) {
         priceRange: { min: priceRangeMin, max: priceRangeMax },
         availability: true,
         ratings: 0,
+        images,
       });
     } else if (role === "decorator") {
       newEntry = new Decorator({
@@ -49,6 +54,40 @@ export async function POST(req: Request) {
         specialties: specialties.split(","),
         availability: true,
         ratings: 0,
+        images,
+      });
+    } else if (role === "caterer") {
+      newEntry = new Caterer({
+        name,
+        email,
+        phone,
+        location,
+        specialties: specialties.split(","),
+        availability: true,
+        ratings: 0,
+        images,
+      });
+    } else if (role === "entertainment") {
+      newEntry = new Entertainment({
+        name,
+        email,
+        phone,
+        location,
+        specialties: specialties.split(","),
+        availability: true,
+        ratings: 0,
+        images,
+      });
+    } else if (role === "logistics") {
+      newEntry = new Logistics({
+        name,
+        email,
+        phone,
+        location,
+        specialties: specialties.split(","),
+        availability: true,
+        ratings: 0,
+        images,
       });
     } else if (role === "venue_distributor") {
       newEntry = new Venue({
@@ -57,7 +96,7 @@ export async function POST(req: Request) {
         capacity,
         pricePerHour: priceRangeMin,
         amenities: amenities.split(","),
-        images: [],
+        images,
         availability: true,
         ratings: 0,
       });

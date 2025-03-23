@@ -84,10 +84,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <HeroUIProvider>
             <NextAuthProvider>
               <Navbar />
+              <Sidebar />
               <div id="main" className="mx-auto dark">
                 <Toaster position="top-center" />
                 <PatchNotes />
-                <Sidebar />
+
                 {children}
               </div>
             </NextAuthProvider>

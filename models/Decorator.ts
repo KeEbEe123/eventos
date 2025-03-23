@@ -8,6 +8,8 @@ interface IDecorator extends Document {
   specialties: string[];
   availability: boolean;
   ratings: number;
+  photos: string[];
+  images: string[];
 }
 
 const DecoratorSchema = new Schema<IDecorator>({
@@ -18,6 +20,8 @@ const DecoratorSchema = new Schema<IDecorator>({
   specialties: { type: [String], required: true },
   availability: { type: Boolean, default: true },
   ratings: { type: Number, default: 0 },
+  photos: { type: [String], default: [] },
+  images: { type: [String], default: [] },
 });
 
 export default mongoose.models.Decorator ||

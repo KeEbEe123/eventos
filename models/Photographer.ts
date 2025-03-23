@@ -10,6 +10,7 @@ interface IPhotographer extends Document {
   priceRange: { min: number; max: number };
   availability: boolean;
   ratings: number; // Average rating
+  images: string[];
 }
 
 const PhotographerSchema = new Schema<IPhotographer>({
@@ -25,6 +26,7 @@ const PhotographerSchema = new Schema<IPhotographer>({
   },
   availability: { type: Boolean, default: true },
   ratings: { type: Number, default: 0 },
+  images: { type: [String], default: [] },
 });
 
 export default mongoose.models.Photographer ||

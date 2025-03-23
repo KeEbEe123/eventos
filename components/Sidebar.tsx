@@ -1,11 +1,16 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { TbArrowLeft, TbArrowRight } from "react-icons/tb";
 
 const Sidebar = () => {
   const [collections, setCollections] = useState<any[]>([]);
   const [collapsed, setCollapsed] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
+  const [position, setPosition] = useState({ x: 50, y: 100 });
+  const [dragging, setDragging] = useState(false);
+  const dragRef = useRef<HTMLDivElement | null>(null);
+  const offset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     fetchCollections();
@@ -31,20 +36,60 @@ const Sidebar = () => {
     }
   };
 
+  const startDrag = (e: React.MouseEvent) => {
+    setDragging(true);
+    offset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  };
+
+  const onDrag = (e: MouseEvent) => {
+    if (dragging) {
+      setPosition({
+        x: e.clientX - offset.current.x,
+        y: e.clientY - offset.current.y,
+      });
+    }
+  };
+
+  const stopDrag = () => {
+    setDragging(false);
+  };
+
+  useEffect(() => {
+    window.addEventListener("mousemove", onDrag);
+    window.addEventListener("mouseup", stopDrag);
+    return () => {
+      window.removeEventListener("mousemove", onDrag);
+      window.removeEventListener("mouseup", stopDrag);
+    };
+  }, [dragging]);
+
   return (
     <div
-      className={`transition-all ${
-        collapsed ? "w-0 overflow-hidden" : "w-1/3"
-      } bg-gray-200 h-screen fixed right-0 top-20 p-4 max-h-[80%]`}
+      ref={dragRef}
+      className="fixed z-50 transition-all duration-300"
+      style={{
+        left: position.x,
+        top: position.y,
+        width: collapsed ? 40 : 300,
+        height: "auto",
+        cursor: dragging ? "grabbing" : "grab",
+      }}
     >
-      <button
-        className="absolute top-4 left-4 bg-gray-500 text-white px-2 py-1 rounded"
-        onClick={() => setCollapsed(!collapsed)}
+      {/* Drag Handle */}
+      <div
+        onMouseDown={startDrag}
+        className="bg-gray-500 text-white p-2 cursor-move rounded-t"
       >
-        {collapsed ? "→" : "←"}
-      </button>
+        <button onClick={() => setCollapsed(!collapsed)} className="text-2xl">
+          {collapsed ? <TbArrowLeft /> : <TbArrowRight />}
+        </button>
+      </div>
+
       {!collapsed && (
-        <>
+        <div className="bg-gray-200 p-4 shadow-xl rounded-b-lg w-full max-h-[90vh] overflow-y-auto">
           <h2 className="text-xl font-bold">Your Collections</h2>
           <ul className="mt-4">
             {collections.map((col) => (
@@ -68,7 +113,7 @@ const Sidebar = () => {
               + Add Collection
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
